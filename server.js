@@ -3,14 +3,24 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const data = require('./data')
 
+
 const app = express()
 const jsonMiddleware = bodyParser.json()
 
 app.use(morgan('tiny'))
 app.use(express.static('public'))
 
+app.post('/api/auth', jsonMiddleware, (req, res) => {
+ const {uid, pwd} = req.body
+ const result = data.authTodo(uid, pwd)
+ res.send(result)
+
+})
+
+
 app.get('/api/todos', (req, res) => {
-  res.send(data.todos)
+  const todo = data.loadTodo()
+  res.send(todo)
 })
 
 app.post('/api/todos', jsonMiddleware, (req, res) => {

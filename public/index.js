@@ -4,7 +4,6 @@
    * 서버에서 할일 템플릿과 할일 데이터를 가져온 후, #todos 요소 안에 렌더링하는 함수
    */
   function loadTodos() {
-    console.log('start loadTodos')
     render({
       target: '#todos',
       templatePath: '/templates/todos.ejs',
@@ -25,7 +24,9 @@
         })
 
         // 삭제 아이콘 클릭시
-        // 비관적 업데이트
+        // 비관적 업데이트(Pessimistic) : event 발생=> ajax 요청 => (성공할지 실패할지 모르겠으니) ajax 응답을 기다림 => 화면 갱신
+        // 낙관적 업데이트(Optimistic) : event 발생=> ajax 요청, 화면 갱신 => ajax 성공,실패 처리 : 실패 처리가 까다롭다
+        // 아래 코드는 비관적 업데이트, 최근엔 낙관적 업데이트 주로 사용
         const removeLink = todoItem.querySelector('.todo-remove')
         removeLink.addEventListener('click', e => {
           axios.delete(`/api/todos/${id}`).then(res => {
@@ -46,6 +47,24 @@
       .then(() => {
         form.elements.title.value = null
       })
+  })
+
+  document.querySelector('#login-form').addEventListener('submit', e => {
+    e.preventDefault()
+    const form = e.currentTarget
+    axios.post('/api/auth', {
+      uid: form.elements.uid.value,
+      pwd: form.elements.pwd.value
+    })
+      .then( res=> {
+       if(res.data.ok==false){ alert("잘못된 계정 정보입니다")}
+         loadTodos()
+      })
+      .then( ()=> {
+        form.elements.uid.value = null
+        form.elements.pwd.value = null
+      })
+
   })
 
   loadTodos()

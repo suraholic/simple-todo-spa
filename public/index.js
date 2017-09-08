@@ -18,8 +18,15 @@
         checkboxEl.addEventListener('click', e => {
           axios.patch(`/api/todos/${id}`, {
             complete: e.currentTarget.checked
+          }, {
+            "headers": {"Authorization": "Bearer " + localStorage.getItem('token')}
           }).then(res => {
             loadTodos()
+          })
+          .catch(err=> {
+            e.srcElement.checked = !e.srcElement.checked
+            alert("로그인 후 이용하세요")
+
           })
         })
 
@@ -29,8 +36,13 @@
         // 아래 코드는 비관적 업데이트, 최근엔 낙관적 업데이트 주로 사용
         const removeLink = todoItem.querySelector('.todo-remove')
         removeLink.addEventListener('click', e => {
-          axios.delete(`/api/todos/${id}`).then(res => {
+          axios.delete(`/api/todos/${id}`,{
+            "headers": {"Authorization": "Bearer " + localStorage.getItem('token')}
+          }).then(res => {
             loadTodos()
+          })
+          .catch(e=> {
+            alert("로그인 후 이용하세요")
           })
         })
       })
@@ -42,9 +54,15 @@
     const form = e.currentTarget
     axios.post('/api/todos', {
       title: form.elements.title.value
+    }, {
+      "headers": {"Authorization": "Bearer " + localStorage.getItem('token')}
     })
       .then(loadTodos)
       .then(() => {
+        form.elements.title.value = null
+      })
+      .catch(e=> {
+        alert("로그인 후 이용하세요")
         form.elements.title.value = null
       })
   })
@@ -57,7 +75,11 @@
       pwd: form.elements.pwd.value
     })
       .then( res=> {
-       if(res.data.ok==false){ alert("잘못된 계정 정보입니다")}
+       if(res.data.ok==false){
+         alert("잘못된 계정 정보입니다")
+      } else {
+        localStorage.setItem('token', res.data.token)
+      }
          loadTodos()
       })
       .then( ()=> {

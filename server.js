@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const data = require('./data')
+const ext = require('./api')
 
 
 const app = express()
@@ -9,6 +10,7 @@ const jsonMiddleware = bodyParser.json()
 
 app.use(morgan('tiny'))
 app.use(express.static('public'))
+
 
 app.post('/api/auth', jsonMiddleware, (req, res) => {
  const {uid, pwd} = req.body
@@ -20,10 +22,11 @@ app.post('/api/auth', jsonMiddleware, (req, res) => {
 
 app.get('/api/todos', (req, res) => {
   const todo = data.loadTodo()
+  console.log(req.headers)
   res.send(todo)
 })
 
-app.post('/api/todos', jsonMiddleware, (req, res) => {
+app.post('/api/todos', jsonMiddleware, ext.authMiddleware, (req, res) => {
   const {title} = req.body
   if (title) {
     const todo = data.addTodo({title})
@@ -34,7 +37,7 @@ app.post('/api/todos', jsonMiddleware, (req, res) => {
   }
 })
 
-app.patch('/api/todos/:id', jsonMiddleware, (req, res) => {
+app.patch('/api/todos/:id', jsonMiddleware, ext.authMiddleware, (req, res) => {
   let id;
   try {
     id = parseInt(req.params.id)
@@ -47,7 +50,7 @@ app.patch('/api/todos/:id', jsonMiddleware, (req, res) => {
   res.send(todo)
 })
 
-app.delete('/api/todos/:id', jsonMiddleware, (req, res) => {
+app.delete('/api/todos/:id', jsonMiddleware, ext.authMiddleware, (req, res) => {
   let id;
   try {
     id = parseInt(req.params.id)

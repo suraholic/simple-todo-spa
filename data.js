@@ -5,7 +5,7 @@ function authTodo(uid, pwd){
 
   if(chk){
     const token = ext.jwt.sign({uid}, ext.SECRET)
-    ext.db.get('users').find({ uid: uid }).assign({ token: token}).write()
+    //ext.db.get('users').find({ uid: uid }).assign({ token: token}).write()
     return {ok: true, token}
   } else {
     return {ok: false, error:'Failed Login'}

@@ -18,9 +18,11 @@ const expressJwt = require('express-jwt')
 const SECRET = 'todospaToken'
 const authMiddleware = expressJwt({secret: SECRET})
 
+
 module.exports = {
   db,
   jwt,
   SECRET,
   authMiddleware
 }
+
